@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --surface-1: #08111f;
+  --surface-2: rgba(11, 20, 36, 0.82);
+  --surface-3: rgba(15, 23, 42, 0.92);
+  --stroke: rgba(148, 163, 184, 0.16);
+  --text-1: #f8fafc;
+  --text-2: #cbd5e1;
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+  --surface-1: #f8fafc;
+  --surface-2: rgba(255, 255, 255, 0.86);
+  --surface-3: rgba(240, 249, 255, 0.92);
+  --stroke: rgba(15, 23, 42, 0.08);
+  --text-1: #08111f;
+  --text-2: #334155;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 24%),
+    linear-gradient(180deg, var(--surface-1), #050914);
+  color: var(--text-1);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, black 42%, transparent 95%);
+}
+
+* {
+  border-color: var(--stroke);
+}
+
+.card-surface {
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
+  border: 1px solid var(--stroke);
+  backdrop-filter: blur(16px);
+}
+
+.text-subtle {
+  color: var(--text-2);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+}
