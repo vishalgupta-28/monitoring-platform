@@ -13,7 +13,7 @@ export function AlertsPanel({ rules, events, services }: { rules: AlertRule[]; e
             <p className="mt-3 font-mono text-sm text-signal">
               {rule.metric_name} {rule.comparison} {rule.threshold}
             </p>
-            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-subtle">{rule.channels.join(' • ')}</p>
+            <p className="mt-2 text-xs uppercase tracking-[0.22em] text-subtle">{rule.channels.join(' | ')}</p>
           </article>
         ))}
       </div>

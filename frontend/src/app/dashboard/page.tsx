@@ -32,7 +32,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
+      <div className="grid gap-4 xl:grid-cols-[1.6fr_0.4fr]">
         <div className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard title="Services monitored" value={`${services.length || 18}`} delta="+3 this week" tone="signal" />

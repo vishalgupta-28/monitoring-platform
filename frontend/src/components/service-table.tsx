@@ -34,7 +34,7 @@ export function ServiceTable({ services }: { services: Service[] }) {
                   {service.status}
                 </span>
               </td>
-              <td className="py-4 text-subtle">{Object.entries(service.tags).map(([key, value]) => `${key}:${value}`).join(' • ')}</td>
+              <td className="py-4 text-subtle">{Object.entries(service.tags).map(([key, value]) => `${key}:${value}`).join(' | ')}</td>
             </tr>
           ))}
         </tbody>

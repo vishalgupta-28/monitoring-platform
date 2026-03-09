@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {navigation.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
-                href={href}
+                href={href as any}
                 className={clsx(
                   'flex items-center justify-between rounded-2xl px-4 py-3 text-sm transition',
                   pathname === href
