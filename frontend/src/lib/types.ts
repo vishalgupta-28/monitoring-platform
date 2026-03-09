@@ -17,6 +17,16 @@ export type Service = {
   created_at: string;
 };
 
+export type ServiceCreatePayload = {
+  name: string;
+  slug: string;
+  service_type: string;
+  base_url: string;
+  environment: string;
+  status: string;
+  tags: Record<string, string>;
+};
+
 export type MetricBucket = {
   timestamp: string;
   avg: number;

@@ -1,5 +1,18 @@
 import { alertEvents, alertRules, currentUser, latestMetrics, logs, metricAggregate, services, simulationRun, simulationScenarios, traceTree, traces } from '@/lib/mock-data';
-import type { AlertEvent, AlertRule, LogEntry, MetricAggregateResponse, MetricPoint, Service, SimulationRun, SimulationScenario, TraceSpan, TraceTree, User } from '@/lib/types';
+import type {
+  AlertEvent,
+  AlertRule,
+  LogEntry,
+  MetricAggregateResponse,
+  MetricPoint,
+  Service,
+  ServiceCreatePayload,
+  SimulationRun,
+  SimulationScenario,
+  TraceSpan,
+  TraceTree,
+  User,
+} from '@/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
 
@@ -29,6 +42,14 @@ async function fetchJson<T>(path: string, init?: RequestInit, fallback?: T): Pro
   }
 }
 
+function buildFallbackService(payload: ServiceCreatePayload): Service {
+  return {
+    id: `local-${crypto.randomUUID()}`,
+    created_at: new Date().toISOString(),
+    ...payload,
+  };
+}
+
 export async function login(payload: { email: string; password: string }) {
   try {
     const response = await fetchJson<{ access_token: string; user: User }>('/auth/login', {
@@ -47,6 +68,7 @@ export async function login(payload: { email: string; password: string }) {
 }
 
 export const getServices = () => fetchJson<Service[]>('/services', undefined, services);
+export const createService = (payload: ServiceCreatePayload) => fetchJson<Service>('/services', { method: 'POST', body: JSON.stringify(payload) }, buildFallbackService(payload));
 export const getMetricAggregate = () => fetchJson<MetricAggregateResponse>('/metrics?metric_name=latency_ms&interval=5%20minutes', undefined, metricAggregate);
 export const getLatestMetrics = () => fetchJson<MetricPoint[]>('/metrics/latest', undefined, latestMetrics);
 export const getAlertRules = () => fetchJson<AlertRule[]>('/alerts', undefined, alertRules);

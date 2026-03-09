@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { SectionCard } from '@/components/section-card';
 import { ServiceTable } from '@/components/service-table';
-import { getServices, getTraceTree } from '@/lib/api';
-import type { Service, TraceTree } from '@/lib/types';
 import { TraceTreeView } from '@/components/trace-tree';
+import { UrlMonitorForm } from '@/components/url-monitor-form';
+import { createService, getServices, getTraceTree } from '@/lib/api';
+import type { Service, ServiceCreatePayload, TraceTree } from '@/lib/types';
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -18,9 +19,20 @@ export default function ServicesPage() {
     getTraceTree('b01c0fda-3fa6-4fd0-8d14-b4b1b4d60001').then(setTrace);
   }, []);
 
+  async function handleServiceCreate(payload: ServiceCreatePayload) {
+    const created = await createService(payload);
+    setServices((current) => [created, ...current]);
+  }
+
   return (
     <AppShell>
       <div className="space-y-4">
+        <SectionCard
+          title="Add a website to monitor"
+          subtitle="Paste any public URL. The platform will register it as a service and the collector will start probing it automatically."
+        >
+          <UrlMonitorForm services={services} onCreated={handleServiceCreate} />
+        </SectionCard>
         <SectionCard title="Service inventory" subtitle="Registered APIs, databases, and microservices with environment and health metadata.">
           <ServiceTable services={services} />
         </SectionCard>
