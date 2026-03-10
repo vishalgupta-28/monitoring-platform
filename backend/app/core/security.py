@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from app.core.config import settings
 
 ALGORITHM = 'HS256'
-password_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+password_context = CryptContext(schemes=['pbkdf2_sha256'], deprecated='auto')
 
 
 def hash_password(password: str) -> str:

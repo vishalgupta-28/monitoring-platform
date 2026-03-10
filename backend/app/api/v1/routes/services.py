@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db, require_role
@@ -15,6 +15,12 @@ async def create_service(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(require_role('operator', 'admin')),
 ) -> Service:
+    existing = await db.scalar(
+        select(Service).where(or_(Service.slug == payload.slug, Service.base_url == payload.base_url))
+    )
+    if existing:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Service already exists for this slug or URL')
+
     service = Service(**payload.model_dump(), created_by=user.id)
     db.add(service)
     await db.commit()

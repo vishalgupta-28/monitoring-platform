@@ -20,6 +20,9 @@ async def bootstrap_demo_data() -> None:
             password_hash=hash_password('admin123'),
             role='admin',
         )
+        session.add(admin)
+        await session.flush()
+
         services = [
             Service(
                 name='Edge API Gateway',
@@ -78,10 +81,10 @@ async def bootstrap_demo_data() -> None:
                 config={'tweets_per_sec': 18000, 'home_timeline_reads_per_sec': 900000, 'fanout_workers': 256},
             ),
         ]
-        session.add(admin)
         session.add_all(services)
         session.add_all(scenarios)
         await session.flush()
+
         session.add(
             AlertRule(
                 service_id=services[0].id,

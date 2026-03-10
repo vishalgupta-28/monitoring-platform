@@ -22,18 +22,16 @@ export function useLiveStream() {
         return;
       }
       fallbackInterval = window.setInterval(() => {
-        setMessages((current) => [
-          {
-            type: 'metric',
-            payload: {
-              service_id: 'edge-api-gateway',
-              metric_name: 'latency_ms',
-              value: Math.round(140 + Math.random() * 120),
-              recorded_at: new Date().toISOString(),
-            },
+        const fallbackMessage: StreamMessage = {
+          type: 'metric',
+          payload: {
+            service_id: 'edge-api-gateway',
+            metric_name: 'latency_ms',
+            value: Math.round(140 + Math.random() * 120),
+            recorded_at: new Date().toISOString(),
           },
-          ...current,
-        ].slice(0, 12));
+        };
+        setMessages((current) => [fallbackMessage, ...current].slice(0, 12));
       }, 2200);
     };
 
