@@ -2,7 +2,9 @@
 
 PulseBoard is a high-performance, real-time observability and monitoring platform designed for modern microservices architectures. It provides a centralized dashboard for metrics, logs, traces, and automated alerting, enabling engineers to gain deep insights into system health and performance.
 
-The platform is built with a distributed architecture using FastAPI, Next.js, Kafka, and RabbitMQ to ensure high throughput and low latency in data ingestion and visualization.
+# overview
+
+“I built a full-stack monitoring platform for distributed systems. Users register services such as APIs, workers, or external URLs. A collector or agent gathers metrics like latency, error rate, CPU, and memory. The FastAPI backend stores that data in PostgreSQL, caches hot reads in Redis, streams events through Kafka, and evaluates alert rules. If thresholds are breached, it creates alert events and pushes notification jobs to RabbitMQ, where a worker sends email, Slack, or webhook alerts. The Next.js frontend provides dashboards, metrics exploration, logs, tracing, alerts, and a simulator for classic system design scenarios. The architecture is horizontally scalable because ingestion, processing, caching, notifications, and UI are decoupled.
 
 ## Table of Contents
 
