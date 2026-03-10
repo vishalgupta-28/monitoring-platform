@@ -3,7 +3,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db, require_role
-from app.db.models import Service, User
+from app.db.models import AlertRule, Service, User
 from app.schemas.service import ServiceCreate, ServiceRead, ServiceUpdate
 
 router = APIRouter()
@@ -23,6 +23,31 @@ async def create_service(
 
     service = Service(**payload.model_dump(), created_by=user.id)
     db.add(service)
+    await db.flush()
+
+    db.add_all(
+        [
+            AlertRule(
+                service_id=service.id,
+                name=f'{service.name} latency above 500ms',
+                metric_name='latency_ms',
+                comparison='gt',
+                threshold=500,
+                severity='warning',
+                channels=['email', 'webhook'],
+            ),
+            AlertRule(
+                service_id=service.id,
+                name=f'{service.name} error rate above 5%',
+                metric_name='error_rate',
+                comparison='gt',
+                threshold=5,
+                severity='critical',
+                channels=['email', 'slack', 'webhook'],
+            ),
+        ]
+    )
+
     await db.commit()
     await db.refresh(service)
     return service
@@ -58,3 +83,16 @@ async def update_service(
     await db.commit()
     await db.refresh(service)
     return service
+
+
+@router.delete('/{service_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_service(
+    service_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_role('operator', 'admin')),
+) -> None:
+    service = await db.get(Service, service_id)
+    if not service:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Service not found')
+    await db.delete(service)
+    await db.commit()

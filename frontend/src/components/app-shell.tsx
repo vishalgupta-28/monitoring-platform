@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Activity, BellRing, Boxes, ChevronRight, LayoutDashboard, LineChart, LogOut, Logs, Sparkles } from 'lucide-react';
+import { Activity, BellRing, Boxes, ChevronRight, LayoutDashboard, LineChart, LogOut, Logs, Sparkles, UserRound } from 'lucide-react';
 import clsx from 'clsx';
 
 import { ThemeToggle } from '@/components/theme-provider';
@@ -77,6 +77,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              {user ? (
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white">
+                  <UserRound size={16} className="text-signal" />
+                  {user.full_name}
+                </div>
+              ) : null}
               <ThemeToggle />
               {user ? (
                 <button

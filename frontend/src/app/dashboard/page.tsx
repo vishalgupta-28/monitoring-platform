@@ -45,7 +45,7 @@ export default function DashboardPage() {
             title="Monitored URLs"
             subtitle="When you add a public URL like instagram.com, the collector probes it and the health result appears here first. External URLs give reachability and latency, not private internal logs or traces."
           >
-            <MonitoredServicesPanel services={services} />
+            <MonitoredServicesPanel services={services} latestMetrics={latest} />
           </SectionCard>
           <SectionCard title="Latency overview" subtitle="Kafka-streamed service latency aggregated by minute.">
             {metrics ? <MetricChart data={metrics.buckets} /> : <p className="text-sm text-subtle">Loading chart...</p>}

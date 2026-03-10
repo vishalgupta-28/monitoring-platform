@@ -9,8 +9,8 @@ export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('admin@pulseboard.dev');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,7 @@ export default function LoginPage() {
           <p className="text-sm uppercase tracking-[0.28em] text-signal">Control plane access</p>
           <h1 className="max-w-2xl text-5xl font-semibold tracking-tight">Real-time infrastructure monitoring for interview prep and production systems.</h1>
           <p className="max-w-xl text-lg text-subtle">
-            Sign in with the seeded admin account or create your own operator account. New accounts can add URLs, view dashboards, and explore alerts and traces.
+            Create your own account to monitor URLs, inspect dashboards, and manage alerts. The form starts blank so you can sign up with your own email and use the app as your own workspace.
           </p>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="card-surface rounded-3xl p-5">
@@ -79,7 +79,7 @@ export default function LoginPage() {
           >
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-subtle">JWT access</p>
-              <h2 className="mt-2 text-3xl font-semibold">{mode === 'signup' ? 'Create an operator account' : 'Operator access'}</h2>
+              <h2 className="mt-2 text-3xl font-semibold">{mode === 'signup' ? 'Create an operator account' : 'Sign in to your workspace'}</h2>
             </div>
             {mode === 'signup' ? (
               <label className="block space-y-2">
@@ -106,3 +106,4 @@ export default function LoginPage() {
     </main>
   );
 }
+
