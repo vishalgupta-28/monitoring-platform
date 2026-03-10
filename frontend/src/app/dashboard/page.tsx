@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/app-shell';
 import { LiveFeed } from '@/components/live-feed';
 import { MetricChart } from '@/components/metric-chart';
+import { MonitoredServicesPanel } from '@/components/monitored-services-panel';
 import { SectionCard } from '@/components/section-card';
 import { StatCard } from '@/components/stat-card';
 import { TraceTreeView } from '@/components/trace-tree';
@@ -40,6 +41,12 @@ export default function DashboardPage() {
             <StatCard title="Error budget burn" value="2.4%" delta="spike" tone="ember" />
             <StatCard title="Uptime" value="99.97%" delta="30d" tone="signal" />
           </div>
+          <SectionCard
+            title="Monitored URLs"
+            subtitle="When you add a public URL like instagram.com, the collector probes it and the health result appears here first. External URLs give reachability and latency, not private internal logs or traces."
+          >
+            <MonitoredServicesPanel services={services} />
+          </SectionCard>
           <SectionCard title="Latency overview" subtitle="Kafka-streamed service latency aggregated by minute.">
             {metrics ? <MetricChart data={metrics.buckets} /> : <p className="text-sm text-subtle">Loading chart...</p>}
           </SectionCard>

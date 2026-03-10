@@ -15,10 +15,24 @@ import type {
 } from '@/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+const TOKEN_KEY = 'pulseboard-token';
+const USER_KEY = 'pulseboard-user';
+
+type AuthResponse = {
+  access_token: string;
+  user: User;
+};
+
+type RegisterPayload = {
+  email: string;
+  full_name: string;
+  password: string;
+  role?: 'viewer' | 'operator' | 'admin';
+};
 
 async function fetchJson<T>(path: string, init?: RequestInit, fallback?: T): Promise<T> {
   try {
-    const token = typeof window !== 'undefined' ? window.localStorage.getItem('pulseboard-token') : null;
+    const token = typeof window !== 'undefined' ? window.localStorage.getItem(TOKEN_KEY) : null;
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
       headers: {
@@ -30,7 +44,8 @@ async function fetchJson<T>(path: string, init?: RequestInit, fallback?: T): Pro
     });
 
     if (!response.ok) {
-      throw new Error(`Request failed with ${response.status}`);
+      const detail = await response.text();
+      throw new Error(detail || `Request failed with ${response.status}`);
     }
 
     return (await response.json()) as T;
@@ -42,6 +57,11 @@ async function fetchJson<T>(path: string, init?: RequestInit, fallback?: T): Pro
   }
 }
 
+function persistSession(accessToken: string, user: User) {
+  window.localStorage.setItem(TOKEN_KEY, accessToken);
+  window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
 function buildFallbackService(payload: ServiceCreatePayload): Service {
   return {
     id: `local-${crypto.randomUUID()}`,
@@ -50,23 +70,55 @@ function buildFallbackService(payload: ServiceCreatePayload): Service {
   };
 }
 
+export function getStoredUser(): User | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const raw = window.localStorage.getItem(USER_KEY);
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw) as User;
+  } catch {
+    return null;
+  }
+}
+
+export function logout() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.removeItem(TOKEN_KEY);
+  window.localStorage.removeItem(USER_KEY);
+}
+
 export async function login(payload: { email: string; password: string }) {
   try {
-    const response = await fetchJson<{ access_token: string; user: User }>('/auth/login', {
+    const response = await fetchJson<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-    window.localStorage.setItem('pulseboard-token', response.access_token);
+    persistSession(response.access_token, response.user);
     return response;
   } catch {
     if (payload.email === 'admin@pulseboard.dev' && payload.password === 'admin123') {
-      window.localStorage.setItem('pulseboard-token', 'demo-token');
+      persistSession('demo-token', currentUser);
       return { access_token: 'demo-token', user: currentUser };
     }
     throw new Error('Invalid credentials');
   }
 }
 
+export async function register(payload: RegisterPayload) {
+  await fetchJson<User>('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ ...payload, role: payload.role ?? 'operator' }),
+  });
+  return login({ email: payload.email, password: payload.password });
+}
+
+export const getMe = () => fetchJson<User>('/auth/me', undefined, getStoredUser() ?? currentUser);
 export const getServices = () => fetchJson<Service[]>('/services', undefined, services);
 export const createService = (payload: ServiceCreatePayload) => fetchJson<Service>('/services', { method: 'POST', body: JSON.stringify(payload) }, buildFallbackService(payload));
 export const getMetricAggregate = () => fetchJson<MetricAggregateResponse>('/metrics?metric_name=latency_ms&interval=5%20minutes', undefined, metricAggregate);
