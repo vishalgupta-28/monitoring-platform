@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db, require_role
 from app.db.models import AlertEvent, AlertRule, User
-from app.schemas.alert import AlertEventRead, AlertRuleCreate, AlertRuleRead
+from app.schemas.alert import AlertEventRead, AlertRuleCreate, AlertRuleRead, AlertRuleUpdate
 
 router = APIRouter()
 
@@ -33,6 +33,38 @@ async def list_rules(
         stmt = stmt.where(AlertRule.service_id == service_id)
     result = await db.scalars(stmt)
     return list(result)
+
+
+@router.patch('/{rule_id}', response_model=AlertRuleRead)
+async def update_rule(
+    rule_id: str,
+    payload: AlertRuleUpdate,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_role('operator', 'admin')),
+) -> AlertRule:
+    rule = await db.get(AlertRule, rule_id)
+    if not rule:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Alert rule not found')
+
+    for key, value in payload.model_dump(exclude_unset=True).items():
+        setattr(rule, key, value)
+    await db.commit()
+    await db.refresh(rule)
+    return rule
+
+
+@router.delete('/{rule_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_rule(
+    rule_id: str,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_role('operator', 'admin')),
+) -> None:
+    rule = await db.get(AlertRule, rule_id)
+    if not rule:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Alert rule not found')
+    await db.execute(delete(AlertEvent).where(AlertEvent.rule_id == rule.id))
+    await db.delete(rule)
+    await db.commit()
 
 
 @router.get('/events', response_model=list[AlertEventRead])

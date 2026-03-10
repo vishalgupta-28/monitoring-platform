@@ -3,6 +3,8 @@ export type User = {
   email: string;
   full_name: string;
   role: 'viewer' | 'operator' | 'admin';
+  is_active?: boolean;
+  created_at?: string;
 };
 
 export type Service = {
@@ -15,6 +17,7 @@ export type Service = {
   status: string;
   tags: Record<string, string>;
   created_at: string;
+  created_by?: string;
 };
 
 export type ServiceCreatePayload = {
@@ -58,9 +61,23 @@ export type AlertRule = {
   metric_name: string;
   comparison: string;
   threshold: number;
+  window_seconds?: number;
   severity: string;
   channels: string[];
+  is_active?: boolean;
   created_at: string;
+};
+
+export type AlertRulePayload = {
+  service_id: string;
+  name: string;
+  metric_name: string;
+  comparison: string;
+  threshold: number;
+  window_seconds: number;
+  severity: string;
+  channels: string[];
+  is_active: boolean;
 };
 
 export type AlertEvent = {
@@ -81,6 +98,7 @@ export type LogEntry = {
   level: string;
   message: string;
   trace_id?: string;
+  attributes?: Record<string, string>;
   recorded_at: string;
 };
 
