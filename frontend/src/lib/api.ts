@@ -15,7 +15,12 @@ import type {
   User,
 } from '@/lib/types';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/v1').replace(/\/$/, '');
+const DEFAULT_API_BASE_URL =
+  typeof window === 'undefined'
+    ? 'http://localhost:8000/api/v1'
+    : `${window.location.protocol}//${window.location.hostname}${window.location.port === '3000' ? ':8000' : window.location.port ? `:${window.location.port}` : ''}/api/v1`;
+
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(/\/$/, '');
 const TOKEN_KEY = 'pulseboard-token';
 const USER_KEY = 'pulseboard-user';
 const LOCAL_SERVICES_KEY = 'pulseboard-local-services';
